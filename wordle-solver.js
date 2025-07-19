@@ -4,7 +4,7 @@ Enhanced Wordle Solver that seeks to maximize information gain with weighted sco
 Key improvements:
 - Uses dual word lists: answers vs all allowed guesses for information gathering
 - Weighted scoring: greens (1.5) valued more than yellows (1.0) 
-- Provides top-4 word recommendations
+- Provides top-8 word recommendations with click-to-fill functionality
 - Enhanced information gathering with expanded guess pool
 
 It does this by:
@@ -13,6 +13,7 @@ It does this by:
 - Tracking the letters that are known to be not in the word
 - Using weighted scoring to better evaluate information quality
 - Recommending multiple good options for strategic play
+- Click any recommendation to auto-fill it into the guess input
 */
 
 class WordleSolver {
@@ -77,7 +78,23 @@ class WordleSolver {
                 this.allWords = [...this.answerWords];
                 this.possibleWords = [...this.answerWords];
             }
-        }
+                }
+    }
+
+    calculateExpectedInformation(pattern) {
+        // Enhanced information scoring based on pattern types
+        // Greens provide most information (1.5), yellows medium (1.0), grays some (0.4)
+        let information = 0;
+        pattern.forEach(result => {
+            if (result === 'green') {
+                information += 1.5; // Exact position known - high information
+            } else if (result === 'yellow') {
+                information += 1.0; // Letter in word but wrong position - medium information  
+            } else if (result === 'grey') {
+                information += 0.4; // Letter not in word - still some information
+            }
+        });
+        return information;
     }
 
     setupEventListeners() {
@@ -233,22 +250,6 @@ class WordleSolver {
         return true;
     }
 
-    calculateExpectedInformation(pattern) {
-        // Enhanced information scoring based on pattern types
-        // Greens provide most information (1.5), yellows medium (1.0), grays some (0.4)
-        let information = 0;
-        pattern.forEach(result => {
-            if (result === 'green') {
-                information += 1.5; // Exact position known - high information
-            } else if (result === 'yellow') {
-                information += 1.0; // Letter in word but wrong position - medium information  
-            } else if (result === 'grey') {
-                information += 0.4; // Letter not in word - still some information
-            }
-        });
-        return information;
-    }
-
     calculateExpectedRemainingWords(guess) {
         if (this.possibleWords.length <= 1) return this.possibleWords.length;
         
@@ -360,7 +361,7 @@ class WordleSolver {
         return result;
     }
 
-    findTopGuesses(numRecommendations = 4) {
+    findTopGuesses(numRecommendations = 8) {
         if (this.possibleWords.length === 0) return [];
         
         // If exactly 1 word remaining, recommend it
@@ -464,7 +465,7 @@ class WordleSolver {
             return;
         }
         
-        const topGuesses = this.findTopGuesses(4);
+        const topGuesses = this.findTopGuesses(8);
         if (topGuesses.length > 0) {
             // Display primary recommendation (first in list)
             document.getElementById('recommendedWord').textContent = topGuesses[0].word;
@@ -489,7 +490,7 @@ class WordleSolver {
                 }
             }
             
-            // Display top-4 recommendations
+            // Display top-8 recommendations
             this.showTopRecommendations(topGuesses);
         }
     }
@@ -507,11 +508,11 @@ class WordleSolver {
         }
         
         topRecsSection.innerHTML = `
-            <h3>Top Recommendations (by Expected Words Remaining):</h3>
+            <h3>Top Recommendations (click to use):</h3>
             <div class="recommendations-grid">
                 ${topGuesses.map((guess, index) => {
                     return `
-                        <div class="recommendation-item ${index === 0 ? 'primary' : ''}">
+                        <div class="recommendation-item ${index === 0 ? 'primary' : ''}" data-word="${guess.word}" style="cursor: pointer;">
                             <div class="rec-left">
                                 <div class="rec-rank">${index + 1}</div>
                                 <div class="rec-word">${guess.word}</div>
@@ -529,6 +530,37 @@ class WordleSolver {
                 }).join('')}
             </div>
         `;
+        
+        // Add click handlers to each recommendation item
+        const recommendationItems = topRecsSection.querySelectorAll('.recommendation-item');
+        recommendationItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                const word = e.currentTarget.dataset.word;
+                this.fillGuessInput(word);
+            });
+        });
+    }
+
+    fillGuessInput(word) {
+        // Set the current guess
+        this.currentGuess = word;
+        
+        // Update the input field
+        const guessInput = document.getElementById('guessWord');
+        guessInput.value = word;
+        
+        // Update the letter display
+        this.updateLetterDisplay();
+        
+        // Focus the input field and scroll to it
+        guessInput.focus();
+        guessInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        
+        // Add a brief highlight effect to show the word was selected
+        guessInput.style.backgroundColor = '#e6fffa';
+        setTimeout(() => {
+            guessInput.style.backgroundColor = '';
+        }, 500);
     }
 
     showFinalAnswers() {
