@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Basic Wordle Solver - AI Assistant</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Basic Wordle Solver</h1>
+            <p>AI-powered assistant to help you solve Wordle puzzles</p>
+        </header>
+
+        <main class="main-layout">
+            <!-- Left Column: Input Section -->
+            <div class="left-column">
+                <section class="input-section">
+                    <h2>Enter Your Guess Result</h2>
+                    <div class="guess-input-container">
+                        <div class="word-input">
+                            <label for="guessWord">Word you guessed:</label>
+                            <input type="text" id="guessWord" maxlength="5" placeholder="SOARE" />
+                        </div>
+                        <div class="result-input">
+                            <label>Result pattern:</label>
+                            <div class="letter-results" id="letterResults">
+                                <div class="letter-result" data-position="0">
+                                    <div class="letter" id="letter0">S</div>
+                                    <div class="result-buttons">
+                                        <button class="result-btn grey active" data-result="grey">GREY</button>
+                                        <button class="result-btn yellow" data-result="yellow">YELLOW</button>
+                                        <button class="result-btn green" data-result="green">GREEN</button>
+                                    </div>
+                                </div>
+                                <div class="letter-result" data-position="1">
+                                    <div class="letter" id="letter1">O</div>
+                                    <div class="result-buttons">
+                                        <button class="result-btn grey active" data-result="grey">GREY</button>
+                                        <button class="result-btn yellow" data-result="yellow">YELLOW</button>
+                                        <button class="result-btn green" data-result="green">GREEN</button>
+                                    </div>
+                                </div>
+                                <div class="letter-result" data-position="2">
+                                    <div class="letter" id="letter2">A</div>
+                                    <div class="result-buttons">
+                                        <button class="result-btn grey active" data-result="grey">GREY</button>
+                                        <button class="result-btn yellow" data-result="yellow">YELLOW</button>
+                                        <button class="result-btn green" data-result="green">GREEN</button>
+                                    </div>
+                                </div>
+                                <div class="letter-result" data-position="3">
+                                    <div class="letter" id="letter3">R</div>
+                                    <div class="result-buttons">
+                                        <button class="result-btn grey active" data-result="grey">GREY</button>
+                                        <button class="result-btn yellow" data-result="yellow">YELLOW</button>
+                                        <button class="result-btn green" data-result="green">GREEN</button>
+                                    </div>
+                                </div>
+                                <div class="letter-result" data-position="4">
+                                    <div class="letter" id="letter4">E</div>
+                                    <div class="result-buttons">
+                                        <button class="result-btn grey active" data-result="grey">GREY</button>
+                                        <button class="result-btn yellow" data-result="yellow">YELLOW</button>
+                                        <button class="result-btn green" data-result="green">GREEN</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="submit-guess" id="submitGuess">Update Recommendation</button>
+                            <button class="reset-game" id="resetGame">New Puzzle</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Algorithm Explanation Section -->
+                <section class="algorithm-explanation">
+                    <h2>How the Algorithm Works</h2>
+                    <div class="explanation-content">
+                        <p><strong>Expected Information Optimization:</strong> The solver calculates how much information each possible guess provides and recommends words that maximize learning.</p>
+                        
+                        <div class="info-scoring">
+                            <h3>Information Scoring:</h3>
+                            <ul>
+                                <li><span class="green-example">Green (1.5 pts)</span> - Exact position known, highest value</li>
+                                <li><span class="yellow-example">Yellow (1.0 pts)</span> - Letter in word, wrong position</li>
+                                <li><span class="grey-example">Grey (0.4 pts)</span> - Letter not in word, still informative</li>
+                            </ul>
+                        </div>
+
+                        <div class="metrics-explanation">
+                            <h3>What the Numbers Mean:</h3>
+                            <ul>
+                                <li><strong>Words Remaining:</strong> Average number of possible answers left after this guess</li>
+                                <li><strong>New Letters:</strong> How many untested letters this word explores</li>
+                                <li><strong>ANSWER Badge:</strong> This word could be the actual solution</li>
+                                <li><strong>Unique Letters:</strong> Ratio of unique letters (5/5 is best for exploration)</li>
+                            </ul>
+                        </div>
+
+                        <p class="strategy-note"><em>Strategy: Early guesses focus on information gathering using the full 25,500+ word database. Later guesses target the remaining possible answers from the 14,855 valid solutions.</em></p>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Right Column: Recommendations, History, Final Answers -->
+            <div class="right-column">
+                <!-- Current Recommendation Section -->
+                <section class="recommendation-section">
+                    <h2>Recommended Word</h2>
+                    <div class="recommendation-card">
+                        <div class="recommended-word" id="recommendedWord">SOARE</div>
+                        <div class="recommendation-reason" id="recommendationReason">
+                            Start with this word - it has the best expected information gain!
+                        </div>
+                        <div class="possible-words-count" id="possibleWordsCount">
+                            Possible words remaining: <span id="wordsCount">14854</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- History Section -->
+                <section class="history-section">
+                    <h2>Guess History</h2>
+                    <div class="guess-history" id="guessHistory">
+                        <div class="history-empty">No guesses yet. Start with the recommended word above!</div>
+                    </div>
+                </section>
+
+                <!-- Final Answer Section (hidden by default) -->
+                <section class="final-answer-section" id="finalAnswerSection" style="display: none;">
+                    <h2>Final Answer</h2>
+                    <div class="final-answers" id="finalAnswers">
+                        <!-- Will be populated when exactly 1 word remains -->
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <footer>
+            <p>Built using expected value optimization algorithm</p>
+            <p><a href="https://github.com/rjmsun" target="_blank" rel="noopener noreferrer">View more projects on GitHub</a></p>
+        </footer>
+    </div>
+
+    <script src="wordle-solver.js"></script>
+</body>
+</html> 

@@ -1,0 +1,26 @@
+WORDLE SOLVER ANALYSIS - 150 RANDOM WORDS
+==================================================
+Sample Size: 100 words
+Success Rate: 94.00%
+Successful Games: 94
+
+CENTRAL TENDENCY:
+Mean: 3.6383 guesses
+Median: 4.0 guesses
+Mode: 4 guesses
+
+VARIABILITY:
+Standard Deviation: 0.9659
+Range: 4 (2 to 6)
+IQR: 1.00 (Q1: 3.00, Q3: 4.00)
+
+CONFIDENCE INTERVALS:
+68%: 2.67 to 4.60 guesses
+95%: 1.71 to 5.57 guesses
+
+GUESS DISTRIBUTION:
+2 guesses:  12 words ( 12.8%)
+3 guesses:  29 words ( 30.9%)
+4 guesses:  36 words ( 38.3%)
+5 guesses:  15 words ( 16.0%)
+6 guesses:   2 words (  2.1%)
